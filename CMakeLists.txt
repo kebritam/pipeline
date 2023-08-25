@@ -29,12 +29,15 @@ else()
     message (STATUS "This is a Release build")
 endif()
 
-add_executable (pipeline "src/pipeline.cpp" "include/pipeline.h")
+add_library(pipeline_static STATIC "src/pipeline.cpp" "include/pipeline.h" "include/thread_pool.h")
+add_library(pipeline_dynamic SHARED "src/pipeline.cpp" "include/pipeline.h" "include/thread_pool.h")
 
 message(STATUS "setting error level")
 if (MSVC)
-	target_compile_options(pipeline PRIVATE /W4 /WX)
+	target_compile_options(pipeline_static PRIVATE /W4 /WX)
+	target_compile_options(pipeline_dynamic PRIVATE /W4 /WX)
 else()
-	target_compile_options(pipeline PRIVATE -Wall -Wextra -pedantic -Werror)
+	target_compile_options(pipeline_static PRIVATE -Wall -Wextra -pedantic -Werror)
+	target_compile_options(pipeline_dynamic PRIVATE -Wall -Wextra -pedantic -Werror)
 endif()
 
