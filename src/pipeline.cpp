@@ -22,7 +22,7 @@ Pipeline::Pipeline(const unsigned int _pipeCount, const PipeElementGenerator _el
 Pipeline::~Pipeline()
 {
 	if (m_pipelineLoopFuture.valid())
-		m_pipelineLoopFuture.get();
+		m_pipelineLoopFuture.wait();
 	delete m_threadPool;
 }
 
@@ -72,8 +72,6 @@ void Pipeline::pipelineLoop() const
 
 		m_elementDeleter(pipeFutures[pipeFutures.size() - 1].get());
 		for (size_t idx = pipelineElements.size() - 1; idx > 0; --idx)
-		{
 			pipelineElements[idx] = pipeFutures[idx - 1].get();
-		}
 	}
 }
