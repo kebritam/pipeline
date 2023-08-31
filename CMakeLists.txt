@@ -29,8 +29,8 @@ else()
     message (STATUS "This is a Release build")
 endif()
 
-add_library(pipeline_static STATIC "src/pipeline.cpp" "include/pipeline.h" "include/thread_pool.h")
-add_library(pipeline_dynamic SHARED "src/pipeline.cpp" "include/pipeline.h" "include/thread_pool.h")
+add_library(pipeline_static STATIC "src/pipeline.cpp" "include/pipeline.h" "include/ThreadPool.h")
+add_library(pipeline_dynamic SHARED "src/pipeline.cpp" "include/pipeline.h" "include/ThreadPool.h")
 
 message(STATUS "setting error level")
 if (MSVC)

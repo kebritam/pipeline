@@ -3,13 +3,10 @@
 #include <future>
 #include <vector>
 
-namespace BS
-{
-	class thread_pool;
-}
-
 namespace pip
 {
+	class ThreadPool;
+
 	class PipelineElement
 	{
 	public:
@@ -22,7 +19,7 @@ namespace pip
 
 	class Pipeline
 	{
-		BS::thread_pool* m_threadPool;
+		ThreadPool* m_threadPool;
 		std::future<void> m_pipelineLoopFuture;
 		bool m_isPipelineStopped;
 

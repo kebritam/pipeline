@@ -1,11 +1,11 @@
 ﻿#include "Pipeline.h"
 
-#include "thread_pool.h"
+#include "ThreadPool.h"
 
 using namespace pip;
 
 Pipeline::Pipeline(const unsigned int _pipeCount, const PipeElementGenerator _elementGenerator)
-	: m_threadPool(new BS::thread_pool(_pipeCount))
+	: m_threadPool(new ThreadPool(_pipeCount))
 	, m_isPipelineStopped(true)
 	, m_elementGenerator(_elementGenerator)
 	, m_elementDeleter([](const PipelineElement* _elem) { delete _elem; })
@@ -60,13 +60,13 @@ void Pipeline::pipelineLoop() const
 		pipeFutures.reserve(m_pipes.size() + 1);
 
 		std::future<PipelineElement*> firstPipeFuture =
-			m_threadPool->submit([this]() { return m_elementGenerator(); });
+			m_threadPool->Enqueue([this]() { return m_elementGenerator(); });
 		pipeFutures.push_back(std::move(firstPipeFuture));
 
 		for (size_t idx = 0 ; idx < pipelineElements.size() - 1 ; ++idx)
 		{
 			std::future<PipelineElement*> pipeFuture =
-				m_threadPool->submit([&, idx]() { return m_pipes[idx](pipelineElements[idx + 1]); });
+				m_threadPool->Enqueue([&, idx]() { return m_pipes[idx](pipelineElements[idx + 1]); });
 			pipeFutures.push_back(std::move(pipeFuture));
 		}
 
