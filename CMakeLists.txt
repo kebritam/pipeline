@@ -10,7 +10,7 @@ project ("pipeline")
 
 set(CMAKE_CXX_STANDARD 20)
 
-include_directories("include")
+include_directories("include" "third-party/include")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	message (STATUS "This is a Debug build")
@@ -29,8 +29,8 @@ else()
     message (STATUS "This is a Release build")
 endif()
 
-add_library(pipeline_static STATIC "src/pipeline.cpp" "include/pipeline.h" "include/ThreadPool.h")
-add_library(pipeline_dynamic SHARED "src/pipeline.cpp" "include/pipeline.h" "include/ThreadPool.h")
+add_library(pipeline_static STATIC "src/pipeline.cpp" "include/pipeline.h")
+add_library(pipeline_dynamic SHARED "src/pipeline.cpp" "include/pipeline.h")
 
 message(STATUS "setting error level")
 if (MSVC)
