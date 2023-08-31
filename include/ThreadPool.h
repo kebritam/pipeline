@@ -64,27 +64,16 @@ namespace pip
 			delete[] m_threads;
 		}
 
-		template<typename F, typename... Args>
-		auto Enqueue(F&& _func, Args... _args) -> std::future<decltype(_func(_args...))>
+		template<typename F, typename... Args, typename R = std::invoke_result_t<std::decay_t<F>, std::decay_t<Args>...>>
+		std::future<R> Enqueue(F&& _func, Args... _args)
 		{
-			std::function<decltype(_func(_args...))()> task(std::bind(std::forward<F>(_func), std::forward<Args>(_args)...));
-			std::shared_ptr<std::promise<decltype(task())>> promise = 
-				std::make_shared<std::promise<decltype(task())>>();
-			std::future<decltype(task())> res = promise->get_future();
+			auto packagedTask = std::make_shared<std::packaged_task<R()>>(std::bind(std::forward<F>(_func), std::forward<Args>(_args)...));
+			auto res = packagedTask->get_future();
 			{
 				std::unique_lock lock(m_mutex);
-				m_tasks.emplace([promise, task]() mutable
+				m_tasks.emplace([packagedTask]()
 				{
-					if constexpr (std::is_void<decltype(task())>::value)
-					{
-						task();
-						promise->set_value();
-					}
-					else
-					{
-						promise->set_value(task());
-					}
-					
+					(*packagedTask)();
 				});
 			}
 			m_cv.notify_one();
