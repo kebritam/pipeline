@@ -63,15 +63,15 @@ void Pipeline::pipelineLoop() const
 			m_threadPool->Enqueue([this]() { return m_elementGenerator(); });
 		pipeFutures.push_back(std::move(firstPipeFuture));
 
-		for (size_t idx = 0 ; idx < pipelineElements.size() - 1 ; ++idx)
+		for (size_t idx = 0 ; idx < m_pipes.size() ; ++idx)
 		{
 			std::future<PipelineElement*> pipeFuture =
-				m_threadPool->Enqueue([&, idx]() { return m_pipes[idx](pipelineElements[idx + 1]); });
+				m_threadPool->Enqueue([&, idx]() { return m_pipes[idx](pipelineElements[idx]); });
 			pipeFutures.push_back(std::move(pipeFuture));
 		}
 
 		m_elementDeleter(pipeFutures[pipeFutures.size() - 1].get());
-		for (size_t idx = pipelineElements.size() - 1; idx > 0; --idx)
-			pipelineElements[idx] = pipeFutures[idx - 1].get();
+		for (size_t idx = 0; idx < pipeFutures.size() - 1; ++idx)
+			pipelineElements[idx] = pipeFutures[idx].get();
 	}
 }
